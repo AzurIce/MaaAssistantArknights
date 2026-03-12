@@ -7,13 +7,6 @@
 #include <string>
 #include <thread>
 
-#ifdef _WIN32
-#include "Platform/Win32IO.h"
-#else
-#include "Platform/PosixIO.h"
-#endif
-#include "Platform/AdbLiteIO.h"
-
 #include "ControllerAPI.h"
 
 #include "ControlScaleProxy.h"
@@ -23,7 +16,6 @@
 #include "InstHelper.h"
 #include "MaaUtils/NoWarningCVMat.hpp"
 #include "MaaUtils/SingletonHolder.hpp"
-#include "adb-lite/client.hpp"
 
 namespace asst
 {
@@ -37,12 +29,11 @@ public:
     Controller(Controller&&) = delete;
     ~Controller();
 
-    std::shared_ptr<ControllerAPI> create_controller(
-        ControllerType type,
+    std::shared_ptr<ControllerAPI> create_dll_controller(
+        const std::string& dll_name,
         const std::string& adb_path,
         const std::string& address,
-        const std::string& config,
-        PlatformType platform_type) const;
+        const std::string& config) const;
 
     bool connect(const std::string& adb_path, const std::string& address, const std::string& config);
 #ifdef _WIN32
@@ -64,7 +55,7 @@ public:
 
     size_t get_version() const noexcept;
 
-    ControllerType get_controller_type() const noexcept;
+    const std::string& get_ctrl_dll_name() const noexcept;
 
     cv::Mat get_image(bool raw = false);
     cv::Mat get_image_cache() const;
@@ -116,9 +107,7 @@ private:
 
     AsstCallback m_callback = nullptr;
 
-    PlatformType m_platform_type = PlatformType::Native;
-
-    ControllerType m_controller_type = ControllerType::Minitouch;
+    std::string m_ctrl_dll_name = "maa-ctrl-minitouch";
 
     std::shared_ptr<ControllerAPI> m_controller = nullptr;
 

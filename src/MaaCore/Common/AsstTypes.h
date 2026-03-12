@@ -54,6 +54,7 @@ enum class TouchMode
     Minitouch = 1,
     Maatouch = 2,
     MacPlayTools = 3,
+    AutoPlay = 4,
 };
 
 #ifdef _WIN32
@@ -97,6 +98,7 @@ using Feat = int64_t;
 constexpr Feat NONE = 0;
 constexpr Feat SWIPE_WITH_PAUSE = 1 << 0;
 constexpr Feat PRECISE_SWIPE = 1 << 1;
+constexpr Feat IMPRECISE_SWIPE = 1 << 2; // ADB-like controllers that overshoot on swipe
 
 inline bool support(Feat feat, Feat target) noexcept
 {

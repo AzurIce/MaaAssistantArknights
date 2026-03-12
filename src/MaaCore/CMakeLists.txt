@@ -1,29 +1,8 @@
 file(GLOB_RECURSE maa_src *.h *.hpp *.cpp)
 
-if(WITH_MAC_SCK)
-    if(APPLE)
-        list(APPEND maa_src Controller/MacSCKHelper.mm)
-    else()
-        message(WARNING "MacSCK is only supported on Apple platforms, ignoring")
-        set(WITH_MAC_SCK OFF)
-    endif()
-endif()
-
 add_library(MaaCore SHARED ${maa_src})
 
-if(WITH_EMULATOR_EXTRAS)
-    if(EXISTS ${PROJECT_SOURCE_DIR}/3rdparty/EmulatorExtras/Mumu)
-        target_include_directories(MaaCore PUBLIC ${PROJECT_SOURCE_DIR}/3rdparty/EmulatorExtras)
-    else()
-        message(WARNING "EmulatorExtras not found, please run `git submodule update --init 3rdparty/EmulatorExtras`")
-        set(WITH_EMULATOR_EXTRAS OFF)
-    endif()
-endif()
-
-target_compile_definitions(MaaCore PRIVATE ASST_WITH_EMULATOR_EXTRAS=$<BOOL:${WITH_EMULATOR_EXTRAS}>)
-target_compile_definitions(MaaCore PRIVATE ASST_WITH_MAC_SCK=$<BOOL:${WITH_MAC_SCK}>)
-
-target_include_directories(MaaCore PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE .)
+target_include_directories(MaaCore PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE . PRIVATE ${PROJECT_SOURCE_DIR}/src/MaaCtrl/include)
 add_dependencies(MaaCore MaaUtils)
 target_link_libraries(MaaCore HeaderOnlyLibraries MaaUtils ${OpenCV_LIBS} fastdeploy_ppocr ONNXRuntime::ONNXRuntime ZLIB::ZLIB Boost::system)
 
@@ -33,15 +12,6 @@ endif()
 
 if(LINUX)
     target_link_libraries(MaaCore pthread dl)
-endif()
-
-if(APPLE AND WITH_MAC_SCK)
-    target_link_libraries(MaaCore "-framework Accelerate"
-                                  "-framework Foundation"
-                                  "-framework CoreGraphics"
-                                  "-framework CoreMedia"
-                                  "-framework CoreVideo"
-                                  "-framework ScreenCaptureKit")
 endif()
 
 file(GLOB_RECURSE MaaCore_PUBLIC_HEADERS ${PROJECT_SOURCE_DIR}/include/*.h)

@@ -30,8 +30,11 @@ bool StartGameTaskPlugin::_run()
         return false;
     }
 
-    // check for MAC / iOS
-    if (ctrler()->get_controller_type() == ControllerType::MacPlayTools) {
+    // PlayTools (macOS/iOS) and AutoPlay handle start_game directly via DLL,
+    // no pipe_data_size check needed.  For these controllers, get_pipe_data_size
+    // returns 0 and get_version returns 0, so the generic path would fail.
+    // Just call start_game directly if pipe_data_size is not meaningful.
+    if (ctrler()->get_pipe_data_size() == 0 && ctrler()->get_version() == 0) {
         return ctrler()->start_game(m_client_type);
     }
 

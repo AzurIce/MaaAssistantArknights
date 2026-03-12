@@ -2,7 +2,6 @@
 
 #include "Utils/Platform.hpp"
 
-#include <boost/regex.hpp>
 #include <utility>
 #include <vector>
 
@@ -18,14 +17,8 @@
 #pragma warning(pop)
 #endif
 
-#include "AdbController.h"
 #include "ControllerAPI.h"
-#include "MaatouchController.h"
-#include "MinitouchController.h"
-#include "PlayToolsController.h"
-#ifdef _WIN32
-#include "Win32Controller.h"
-#endif
+#include "DllController.h"
 
 #include "Common/AsstTypes.h"
 #include "Utils/Logger.hpp"
@@ -42,34 +35,18 @@ asst::Controller::~Controller()
     LogTraceFunction;
 }
 
-std::shared_ptr<asst::ControllerAPI> asst::Controller::create_controller(
-    ControllerType type,
+std::shared_ptr<asst::ControllerAPI> asst::Controller::create_dll_controller(
+    const std::string& dll_name,
     const std::string& adb_path,
     const std::string& address,
-    const std::string& config,
-    PlatformType platform_type) const
+    const std::string& config) const
 {
     std::shared_ptr<ControllerAPI> controller;
     try {
-        switch (type) {
-        case ControllerType::Adb:
-            controller = std::make_shared<AdbController>(m_callback, m_inst, platform_type);
-            break;
-        case ControllerType::Minitouch:
-            controller = std::make_shared<MinitouchController>(m_callback, m_inst, platform_type);
-            break;
-        case ControllerType::Maatouch:
-            controller = std::make_shared<MaatouchController>(m_callback, m_inst, platform_type);
-            break;
-        case ControllerType::MacPlayTools:
-            controller = std::make_shared<PlayToolsController>(m_callback, m_inst, platform_type);
-            break;
-        default:
-            return nullptr;
-        }
+        controller = std::make_shared<DllController>(m_callback, m_inst, dll_name);
     }
     catch (const std::exception& e) {
-        Log.error("Unable to create controller: {}", e.what());
+        Log.error("Unable to create DllController for", dll_name, ":", e.what());
         return nullptr;
     }
     if (controller->connect(adb_path, address, config)) {
@@ -88,9 +65,9 @@ size_t asst::Controller::get_version() const noexcept
     return m_controller->get_version();
 }
 
-asst::ControllerType asst::Controller::get_controller_type() const noexcept
+const std::string& asst::Controller::get_ctrl_dll_name() const noexcept
 {
-    return m_controller_type;
+    return m_ctrl_dll_name;
 }
 
 std::pair<int, int> asst::Controller::get_scale_size() const noexcept
@@ -122,7 +99,6 @@ void asst::Controller::callback(AsstMsg msg, const json::value& details)
 void asst::Controller::sync_params()
 {
     if (!m_controller) {
-        // 参数没有实时同步，但是在连接时会被同步
         Log.info("skip sync_params, retry when connect");
         return;
     }
@@ -234,7 +210,7 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
 
     clear_info();
 
-    m_controller = create_controller(m_controller_type, adb_path, address, config, m_platform_type);
+    m_controller = create_dll_controller(m_ctrl_dll_name, adb_path, address, config);
     if (!m_controller) {
         Log.error("connect failed");
         return false;
@@ -256,6 +232,8 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
         return false;
     }
 
+    auto initial_features = m_controller->support_features();
+
     auto proxy_callback = [&](const json::object& details) {
         json::value connection_info = json::object {
             { "uuid", m_uuid },
@@ -270,7 +248,7 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
     };
 
     try {
-        m_scale_proxy = std::make_shared<ControlScaleProxy>(m_controller, m_controller_type, proxy_callback);
+        m_scale_proxy = std::make_shared<ControlScaleProxy>(m_controller, initial_features, proxy_callback);
     }
     catch (const std::exception& e) {
         Log.error("Cannot create controller proxy: {}", e.what());
@@ -298,14 +276,21 @@ bool asst::Controller::attach_window(
 
     clear_info();
 
-    auto win32_controller = std::make_shared<Win32Controller>(m_callback, m_inst);
-    if (!win32_controller->attach(hwnd, screencap_method, mouse_method, keyboard_method)) {
+    // Build config JSON for Win32 DLL
+    json::value config_json = json::object {
+        { "hwnd", reinterpret_cast<uintptr_t>(hwnd) },
+        { "screencap_method", screencap_method },
+        { "mouse_method", mouse_method },
+        { "keyboard_method", keyboard_method },
+    };
+
+    m_ctrl_dll_name = "maa-ctrl-win32";
+    m_controller = create_dll_controller(m_ctrl_dll_name, "", "", config_json.to_string());
+    if (!m_controller) {
         Log.error("attach_window failed");
         return false;
     }
 
-    m_controller = win32_controller;
-    m_controller_type = ControllerType::Win32;
     m_uuid = m_controller->get_uuid();
 
     // 尝试截图
@@ -313,6 +298,8 @@ bool asst::Controller::attach_window(
         Log.error("Cannot screencap!");
         return false;
     }
+
+    auto initial_features = m_controller->support_features();
 
     auto proxy_callback = [&](const json::object& details) {
         json::value connection_info = json::object {
@@ -329,7 +316,7 @@ bool asst::Controller::attach_window(
     };
 
     try {
-        m_scale_proxy = std::make_shared<ControlScaleProxy>(m_controller, m_controller_type, proxy_callback);
+        m_scale_proxy = std::make_shared<ControlScaleProxy>(m_controller, initial_features, proxy_callback);
     }
     catch (const std::exception& e) {
         Log.error("Cannot create controller proxy: {}", e.what());
@@ -357,19 +344,22 @@ void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
 {
     switch (mode) {
     case TouchMode::Adb:
-        m_controller_type = ControllerType::Adb;
+        m_ctrl_dll_name = "maa-ctrl-adb";
         break;
     case TouchMode::Minitouch:
-        m_controller_type = ControllerType::Minitouch;
+        m_ctrl_dll_name = "maa-ctrl-minitouch";
         break;
     case TouchMode::Maatouch:
-        m_controller_type = ControllerType::Maatouch;
+        m_ctrl_dll_name = "maa-ctrl-maatouch";
         break;
     case TouchMode::MacPlayTools:
-        m_controller_type = ControllerType::MacPlayTools;
+        m_ctrl_dll_name = "maa-ctrl-playtools";
+        break;
+    case TouchMode::AutoPlay:
+        m_ctrl_dll_name = "maa-ctrl-autoplay";
         break;
     default:
-        m_controller_type = ControllerType::Minitouch;
+        m_ctrl_dll_name = "maa-ctrl-minitouch";
     }
 }
 
@@ -381,7 +371,10 @@ void asst::Controller::set_swipe_with_pause(bool enable) noexcept
 
 void asst::Controller::set_adb_lite_enabled(bool enable) noexcept
 {
-    m_platform_type = enable ? PlatformType::AdbLite : PlatformType::Native;
+    // ADB lite configuration is now handled via config_json passed to DLL
+    // This is kept for API compatibility but is a no-op;
+    // the caller should include adb_lite preference in the config string.
+    (void)enable;
 }
 
 void asst::Controller::set_kill_adb_on_exit(bool enable) noexcept

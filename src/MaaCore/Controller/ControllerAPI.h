@@ -9,17 +9,6 @@ namespace asst
 {
 struct InputEvent;
 
-enum class ControllerType
-{
-    Adb,
-    Minitouch,
-    Maatouch,
-    MacPlayTools,
-#ifdef _WIN32
-    Win32,
-#endif
-};
-
 class ControllerAPI
 {
 public:

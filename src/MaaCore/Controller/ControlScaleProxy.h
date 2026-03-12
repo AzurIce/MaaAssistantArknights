@@ -17,7 +17,7 @@ public:
 public:
     ControlScaleProxy(
         std::shared_ptr<ControllerAPI> controller,
-        ControllerType controller_type,
+        ControlFeat::Feat initial_features,
         ProxyCallback proxy_callback);
     ~ControlScaleProxy() = default;
 
@@ -58,7 +58,7 @@ private:
     void callback(const json::object& details);
 
     std::shared_ptr<ControllerAPI> m_controller;
-    ControllerType m_controller_type = ControllerType::Minitouch;
+    ControlFeat::Feat m_features = ControlFeat::NONE;
     ProxyCallback m_callback = nullptr;
 
     std::mt19937 m_rand_engine;

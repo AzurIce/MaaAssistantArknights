@@ -5,10 +5,10 @@
 
 asst::ControlScaleProxy::ControlScaleProxy(
     std::shared_ptr<ControllerAPI> controller,
-    ControllerType controller_type,
+    ControlFeat::Feat initial_features,
     ProxyCallback proxy_callback) :
     m_controller(controller),
-    m_controller_type(controller_type),
+    m_features(initial_features),
     m_callback(proxy_callback),
     m_rand_engine(std::random_device {}())
 {
@@ -136,11 +136,10 @@ bool asst::ControlScaleProxy::swipe(
         rand_p2 = rand_point_in_rect(r2);
     }
 
-    if (m_controller_type == ControllerType::Adb && !(precise1 && precise2)) {
+    // Use IMPRECISE_SWIPE feature flag instead of checking ControllerType::Adb
+    if (ControlFeat::support(m_features, ControlFeat::IMPRECISE_SWIPE) && !(precise1 && precise2)) {
         // 只有不是精确点时才做ADB修正
         // 同样的参数 ADB 总是划过头，糊点屎进来
-        // 外部调用 swipe(Point, Point) 时，说明是精确要求位置的，不能做这个调整
-        // 所以屎没法糊在下面一层，只能糊在这里了（
         const auto& opt = Config.get_options();
         auto x_dist = rand_p1.x - rand_p2.x;
         rand_p2.x = rand_p1.x - static_cast<int>(x_dist * opt.adb_swipe_x_distance_multiplier);
