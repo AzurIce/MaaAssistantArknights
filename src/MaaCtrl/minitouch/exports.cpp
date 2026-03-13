@@ -1,6 +1,7 @@
 // maa-ctrl-minitouch exports.cpp
 // Wraps MinitouchController behind the maa_ctrl_* C-ABI.
 
+#define MAA_CTRL_EXPORTS
 #include "maa_ctrl_api.h"
 
 #include <string>

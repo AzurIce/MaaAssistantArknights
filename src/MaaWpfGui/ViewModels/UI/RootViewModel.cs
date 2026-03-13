@@ -53,21 +53,24 @@ public class RootViewModel : Conductor<Screen>.Collection.OneActive
         }
 
         Task.Run(async () => {
-            await Instances.AnnouncementDialogViewModel.CheckAndDownloadAnnouncement();
-            if (Instances.AnnouncementDialogViewModel.DoNotRemindThisAnnouncementAgain)
-            {
-                return;
-            }
+            // await Instances.AnnouncementDialogViewModel.CheckAndDownloadAnnouncement();
+            // if (Instances.AnnouncementDialogViewModel.DoNotRemindThisAnnouncementAgain)
+            // {
+            //     return;
+            // }
+            //
+            // if (Instances.AnnouncementDialogViewModel.DoNotShowAnnouncement)
+            // {
+            //     return;
+            // }
+            //
+            // if (Instances.AnnouncementDialogViewModel.AnnouncementInfo != string.Empty)
+            // {
+            //     _ = Execute.OnUIThreadAsync(() => Instances.WindowManager.ShowWindow(Instances.AnnouncementDialogViewModel));
+            // }
 
-            if (Instances.AnnouncementDialogViewModel.DoNotShowAnnouncement)
-            {
-                return;
-            }
-
-            if (Instances.AnnouncementDialogViewModel.AnnouncementInfo != string.Empty)
-            {
-                _ = Execute.OnUIThreadAsync(() => Instances.WindowManager.ShowWindow(Instances.AnnouncementDialogViewModel));
-            }
+            // 公告已禁用
+            await Task.CompletedTask;
         });
 
         _ = Instances.VersionUpdateDialogViewModel.ShowUpdateOrDownload();

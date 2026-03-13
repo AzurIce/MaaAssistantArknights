@@ -1,4 +1,4 @@
-#include "AdbController.h"
+#include "AdbBase.h"
 
 #include "Assistant.h"
 #include "MaaUtils/NoWarningCV.hpp"

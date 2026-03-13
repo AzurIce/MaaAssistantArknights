@@ -2,6 +2,7 @@
 // Wraps AdbBase (AdbController) behind the maa_ctrl_* C-ABI.
 // This DLL uses pure adb shell commands for input (no minitouch).
 
+#define MAA_CTRL_EXPORTS
 #include "maa_ctrl_api.h"
 
 #include <string>

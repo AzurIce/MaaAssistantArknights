@@ -1,6 +1,7 @@
 # maa-ctrl-autoplay — AutoPlay framework controller DLL
 
-file(GLOB_RECURSE autoplay_src *.h *.hpp *.cpp)
+# Only compile AutoPlayLoader and exports, not the full controller
+file(GLOB autoplay_src AutoPlayLoader.h AutoPlayLoader.cpp exports.cpp)
 
 add_library(maa-ctrl-autoplay SHARED ${autoplay_src})
 
@@ -9,7 +10,7 @@ target_include_directories(maa-ctrl-autoplay
     PRIVATE ${PROJECT_SOURCE_DIR}/src/MaaCore
 )
 
-target_link_libraries(maa-ctrl-autoplay HeaderOnlyLibraries MaaUtils)
+target_link_libraries(maa-ctrl-autoplay HeaderOnlyLibraries MaaUtils ${OpenCV_LIBS} MaaCore)
 
 if(WIN32)
     # For LoadLibrary/GetProcAddress

@@ -1,6 +1,7 @@
 // maa-ctrl-autoplay exports.cpp
 // Wraps AutoPlayController (which internally loads ap_ffi) behind the maa_ctrl_* C-ABI.
 
+#define MAA_CTRL_EXPORTS
 #include "maa_ctrl_api.h"
 #include "AutoPlayLoader.h"
 

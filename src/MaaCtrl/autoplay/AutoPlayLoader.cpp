@@ -1,6 +1,24 @@
 #include "AutoPlayLoader.h"
 
-#include "Utils/Logger.hpp"
+// #include "Utils/Logger.hpp"  // Avoid Platform.h dependency
+#include <iostream>
+#include <sstream>
+
+// Simple logging for DLL (variadic template version)
+namespace asst {
+    struct LoggerStub {
+        template<typename... Args>
+        void warn(Args&&...) {}
+
+        template<typename... Args>
+        void info(Args&&...) {}
+
+        template<typename... Args>
+        void error(Args&&...) {}
+    } Log;
+}
+
+#define LogTraceFunction  // Stub macro
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -165,7 +183,7 @@ bool AutoPlayLoader::get_screen_res(const void* handle, int32_t* w, int32_t* h)
     return m_get_screen_res(handle, w, h);
 }
 
-int64_t AutoPlayLoader::support_features(const void* handle)
+int64_t AutoPlayLoader::support_features(const void* handle) const
 {
     if (!m_support_features || !handle) return 0;
     return m_support_features(handle);
@@ -177,7 +195,7 @@ bool AutoPlayLoader::screencap(void* handle)
     return m_screencap(handle);
 }
 
-bool AutoPlayLoader::get_image(const void* handle, uint32_t* w, uint32_t* h, const uint8_t** data, uint32_t* len)
+bool AutoPlayLoader::get_image(const void* handle, uint32_t* w, uint32_t* h, const uint8_t** data, uint32_t* len) const
 {
     if (!m_get_image || !handle) return false;
     return m_get_image(handle, w, h, data, len);
@@ -220,7 +238,7 @@ bool AutoPlayLoader::stop_game(void* handle, const char* intent)
     return m_stop_game(handle, intent);
 }
 
-const char* AutoPlayLoader::last_error(const void* handle)
+const char* AutoPlayLoader::last_error(const void* handle) const
 {
     if (!m_last_error || !handle) return nullptr;
     return m_last_error(handle);

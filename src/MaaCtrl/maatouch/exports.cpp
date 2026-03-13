@@ -1,6 +1,7 @@
 // maa-ctrl-maatouch exports.cpp
 // Same as minitouch but with m_use_maa_touch=true internally.
 
+#define MAA_CTRL_EXPORTS
 #include "maa_ctrl_api.h"
 
 #include <string>

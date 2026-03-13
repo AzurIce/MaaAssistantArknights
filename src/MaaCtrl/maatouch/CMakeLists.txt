@@ -8,4 +8,4 @@ target_include_directories(maa-ctrl-maatouch
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../minitouch  # for MinitouchImpl headers
 )
 
-target_link_libraries(maa-ctrl-maatouch maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils)
+target_link_libraries(maa-ctrl-maatouch maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils MaaCore)

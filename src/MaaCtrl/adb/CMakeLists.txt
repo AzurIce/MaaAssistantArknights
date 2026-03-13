@@ -7,4 +7,4 @@ target_include_directories(maa-ctrl-adb
     PRIVATE ${PROJECT_SOURCE_DIR}/src/MaaCore
 )
 
-target_link_libraries(maa-ctrl-adb maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils)
+target_link_libraries(maa-ctrl-adb maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils MaaCore)

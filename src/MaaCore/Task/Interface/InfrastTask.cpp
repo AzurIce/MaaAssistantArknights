@@ -419,7 +419,7 @@ bool asst::InfrastTask::parse_and_set_custom_config(const std::filesystem::path&
             }
 
             drones_only_task_ptr->set_custom_config(
-                infrast::CustomFacilityConfig(drones_config.index + 1, infrast::CustomRoomConfig { .skip = true }));
+                infrast::CustomFacilityConfig(drones_config.index + 1, infrast::CustomRoomConfig { .skip = true, .operator_groups = {} }));
             drones_only_task_ptr->set_custom_drones_config(std::move(drones_config));
             m_subtasks.insert(m_subtasks.begin(), { m_infrast_begin_task_ptr, drones_only_task_ptr });
         }

@@ -98,8 +98,29 @@ internal static partial class MaaService
 
     [LibraryImport("MaaCore.dll")]
     internal static unsafe partial void AsstSetConnectionExtras(byte* name, byte* extras);
+
+    [LibraryImport("MaaCore.dll")]
+    internal static unsafe partial int maa_ctrl_enumerate(MaaCtrlInfo** out_infos);
+
+    [LibraryImport("MaaCore.dll")]
+    internal static unsafe partial void maa_ctrl_enum_free(MaaCtrlInfo* infos, int count);
 }
 #pragma warning restore SA1601 // Partial elements should be documented
+
+/// <summary>
+/// C-ABI Controller Info structure
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+public struct MaaCtrlInfo
+{
+    [MarshalAs(UnmanagedType.SysInt)]
+    public IntPtr Name;              /* "minitouch", "adb", etc. */
+    [MarshalAs(UnmanagedType.SysInt)]
+    public IntPtr DisplayName;       /* "Minitouch", "ADB Input", etc. */
+    public long SupportedFeatures;   /* Feature flags (MAA_CTRL_FEAT_*) */
+    [MarshalAs(UnmanagedType.SysInt)]
+    public IntPtr Description;       /* "Minitouch (Default)", etc. */
+}
 
 public enum AsstTaskType : byte
 {

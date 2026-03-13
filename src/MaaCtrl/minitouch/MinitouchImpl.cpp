@@ -1,4 +1,4 @@
-#include "MinitouchController.h"
+#include "MinitouchImpl.h"
 
 #include <future>
 

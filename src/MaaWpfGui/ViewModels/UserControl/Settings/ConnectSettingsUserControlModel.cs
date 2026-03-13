@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -28,6 +29,7 @@ using JetBrains.Annotations;
 using MaaWpfGui.Constants;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Main;
+using MaaWpfGui.Services;
 using MaaWpfGui.States;
 using MaaWpfGui.Utilities;
 using MaaWpfGui.Utilities.ValueType;
@@ -56,6 +58,7 @@ public class ConnectSettingsUserControlModel : PropertyChangedBase
     private ConnectSettingsUserControlModel()
     {
         PropertyDependsOnUtility.InitializePropertyDependencies(this);
+        _touchModeList = LoadAvailableTouchModes();
     }
 
     public static ConnectSettingsUserControlModel Instance { get; }
@@ -82,15 +85,64 @@ public class ConnectSettingsUserControlModel : PropertyChangedBase
             new() { Display = LocalizationHelper.GetString("GeneralWithoutScreencapErr"), Value = "GeneralWithoutScreencapErr" },
         ];
 
+    private List<CombinedData> _touchModeList = [];
+
     /// <summary>
     /// Gets the list of touch modes
     /// </summary>
-    public List<CombinedData> TouchModeList { get; } =
+    public List<CombinedData> TouchModeList => _touchModeList;
+
+    /// <summary>
+    /// Load available touch modes from C++ via P/Invoke
+    /// </summary>
+    private static List<CombinedData> LoadAvailableTouchModes()
+    {
+        var touchModes = new List<CombinedData>();
+
+        try
+        {
+            unsafe
+            {
+                MaaCtrlInfo* infos = null;
+                int count = MaaService.maa_ctrl_enumerate(&infos);
+
+                if (count > 0 && infos != null)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        string name = Marshal.PtrToStringAnsi(infos[i].Name) ?? string.Empty;
+                        string displayName = Marshal.PtrToStringAnsi(infos[i].DisplayName) ?? string.Empty;
+
+                        touchModes.Add(new() { Display = displayName, Value = name });
+                    }
+
+                    MaaService.maa_ctrl_enum_free(infos, count);
+                }
+            }
+
+            if (touchModes.Count > 0)
+            {
+                _logger.Information("Loaded {Count} touch modes from C++", touchModes.Count);
+                return touchModes;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.Warning(ex, "Failed to load touch modes from C++, using fallback");
+        }
+
+        // Fallback: hardcoded list if enumeration fails
+        touchModes =
         [
             new() { Display = LocalizationHelper.GetString("MiniTouchMode"), Value = "minitouch" },
             new() { Display = LocalizationHelper.GetString("MaaTouchMode"), Value = "maatouch" },
             new() { Display = LocalizationHelper.GetString("AdbTouchMode"), Value = "adb" },
+            new() { Display = "PlayTools", Value = "playtools" },
+            new() { Display = "AutoPlay", Value = "autoplay" },
         ];
+
+        return touchModes;
+    }
 
     private bool _autoDetectConnection = Convert.ToBoolean(ConfigurationHelper.GetValue(ConfigurationKeys.AutoDetect, bool.TrueString));
 

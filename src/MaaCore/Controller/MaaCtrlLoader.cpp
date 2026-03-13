@@ -162,37 +162,37 @@ void MaaCtrlLoader::destroy(MaaCtrlHandle* handle)
 
 // --- Status ---
 
-bool MaaCtrlLoader::inited(const MaaCtrlHandle* handle)
+bool MaaCtrlLoader::inited(const MaaCtrlHandle* handle) const
 {
     if (!m_inited || !handle) return false;
     return m_inited(handle);
 }
 
-const char* MaaCtrlLoader::get_uuid(const MaaCtrlHandle* handle)
+const char* MaaCtrlLoader::get_uuid(const MaaCtrlHandle* handle) const
 {
     if (!m_get_uuid || !handle) return nullptr;
     return m_get_uuid(handle);
 }
 
-bool MaaCtrlLoader::get_screen_res(const MaaCtrlHandle* handle, int32_t* w, int32_t* h)
+bool MaaCtrlLoader::get_screen_res(const MaaCtrlHandle* handle, int32_t* w, int32_t* h) const
 {
     if (!m_get_screen_res || !handle) return false;
     return m_get_screen_res(handle, w, h);
 }
 
-int64_t MaaCtrlLoader::support_features(const MaaCtrlHandle* handle)
+int64_t MaaCtrlLoader::support_features(const MaaCtrlHandle* handle) const
 {
     if (!m_support_features || !handle) return 0;
     return m_support_features(handle);
 }
 
-uint64_t MaaCtrlLoader::get_pipe_data_size(const MaaCtrlHandle* handle)
+uint64_t MaaCtrlLoader::get_pipe_data_size(const MaaCtrlHandle* handle) const
 {
     if (!m_get_pipe_data_size || !handle) return 0;
     return m_get_pipe_data_size(handle);
 }
 
-uint64_t MaaCtrlLoader::get_version(const MaaCtrlHandle* handle)
+uint64_t MaaCtrlLoader::get_version(const MaaCtrlHandle* handle) const
 {
     if (!m_get_version || !handle) return 0;
     return m_get_version(handle);
@@ -207,7 +207,7 @@ bool MaaCtrlLoader::screencap(MaaCtrlHandle* handle)
 }
 
 bool MaaCtrlLoader::get_image(const MaaCtrlHandle* handle, uint32_t* w, uint32_t* h,
-                               const uint8_t** data, uint32_t* len)
+                               const uint8_t** data, uint32_t* len) const
 {
     if (!m_get_image || !handle) return false;
     return m_get_image(handle, w, h, data, len);
@@ -316,13 +316,13 @@ void MaaCtrlLoader::set_swipe_with_pause(MaaCtrlHandle* handle, bool enable)
 
 // --- Error & version ---
 
-const char* MaaCtrlLoader::last_error(const MaaCtrlHandle* handle)
+const char* MaaCtrlLoader::last_error(const MaaCtrlHandle* handle) const
 {
     if (!m_last_error || !handle) return nullptr;
     return m_last_error(handle);
 }
 
-const char* MaaCtrlLoader::version()
+const char* MaaCtrlLoader::version() const
 {
     if (!m_version) return nullptr;
     return m_version();

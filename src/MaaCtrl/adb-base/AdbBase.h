@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ControllerAPI.h"
+#include "../../src/MaaCore/Controller/ControllerAPI.h"
 
 #include <deque>
 #include <random>

@@ -28,9 +28,9 @@ public:
     bool inited(const void* handle);
     const char* get_uuid(const void* handle);
     bool get_screen_res(const void* handle, int32_t* w, int32_t* h);
-    int64_t support_features(const void* handle);
+    int64_t support_features(const void* handle) const;
     bool screencap(void* handle);
-    bool get_image(const void* handle, uint32_t* w, uint32_t* h, const uint8_t** data, uint32_t* len);
+    bool get_image(const void* handle, uint32_t* w, uint32_t* h, const uint8_t** data, uint32_t* len) const;
     bool click(void* handle, int32_t x, int32_t y);
     bool swipe(void* handle, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t duration_ms, double slope_in,
                double slope_out);
@@ -38,7 +38,7 @@ public:
     bool input_text(void* handle, const char* text);
     bool start_game(void* handle, const char* intent);
     bool stop_game(void* handle, const char* intent);
-    const char* last_error(const void* handle);
+    const char* last_error(const void* handle) const;
     const char* version();
 
 private:

@@ -70,7 +70,7 @@ inline bool LibraryHolder<T>::load_library(const std::filesystem::path& libname)
     LogInfo << "Loading library" << VAR(libname);
 
 #ifdef _WIN32
-    module_ = LoadLibrary(libname.c_str());
+    module_ = LoadLibraryW(libname.c_str());
 #else
     module_ = dlopen(libname.c_str(), RTLD_LAZY);
 #endif

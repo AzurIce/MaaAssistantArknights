@@ -5,7 +5,7 @@
 #include "MaaUtils/NoWarningCV.hpp"
 #include "MaaUtils/SafeWindows.hpp"
 #include "Utils/Logger.hpp"
-#include <Controller/AdbController.h>
+#include "AdbBase.h"
 #include <sstream>
 #include <string>
 

@@ -321,7 +321,8 @@ public partial class OverlayWindow : Window
     {
         Opacity = 0;
         Show();
-        PInvoke.SetWindowLongPtr((HWND)_overlayHwnd, WINDOW_LONG_PTR_INDEX.GWL_HWNDPARENT, _targetHwnd);
+        // Use SetWindowLong instead of SetWindowLongPtr for compatibility
+        PInvoke.SetWindowLong((HWND)_overlayHwnd, WINDOW_LONG_PTR_INDEX.GWL_HWNDPARENT, (int)_targetHwnd);
         UpdatePosition();
         Opacity = 1;
     }

@@ -31,17 +31,17 @@ public:
     void destroy(MaaCtrlHandle* handle);
 
     // --- Status ---
-    bool inited(const MaaCtrlHandle* handle);
-    const char* get_uuid(const MaaCtrlHandle* handle);
-    bool get_screen_res(const MaaCtrlHandle* handle, int32_t* w, int32_t* h);
-    int64_t support_features(const MaaCtrlHandle* handle);
-    uint64_t get_pipe_data_size(const MaaCtrlHandle* handle);
-    uint64_t get_version(const MaaCtrlHandle* handle);
+    bool inited(const MaaCtrlHandle* handle) const;
+    const char* get_uuid(const MaaCtrlHandle* handle) const;
+    bool get_screen_res(const MaaCtrlHandle* handle, int32_t* w, int32_t* h) const;
+    int64_t support_features(const MaaCtrlHandle* handle) const;
+    uint64_t get_pipe_data_size(const MaaCtrlHandle* handle) const;
+    uint64_t get_version(const MaaCtrlHandle* handle) const;
 
     // --- Screenshot ---
     bool screencap(MaaCtrlHandle* handle);
     bool get_image(const MaaCtrlHandle* handle, uint32_t* w, uint32_t* h,
-                   const uint8_t** data, uint32_t* len);
+                   const uint8_t** data, uint32_t* len) const;
 
     // --- Input ---
     bool click(MaaCtrlHandle* handle, int32_t x, int32_t y);
@@ -68,8 +68,8 @@ public:
     void set_swipe_with_pause(MaaCtrlHandle* handle, bool enable);
 
     // --- Error & version ---
-    const char* last_error(const MaaCtrlHandle* handle);
-    const char* version();
+    const char* last_error(const MaaCtrlHandle* handle) const;
+    const char* version() const;
 
 private:
     void* m_module = nullptr;

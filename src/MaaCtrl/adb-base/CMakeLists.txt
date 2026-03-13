@@ -19,7 +19,7 @@ endif()
 
 target_compile_definitions(maa-ctrl-adb-base PRIVATE ASST_WITH_EMULATOR_EXTRAS=$<BOOL:${WITH_EMULATOR_EXTRAS}>)
 
-target_link_libraries(maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils Boost::system)
+target_link_libraries(maa-ctrl-adb-base HeaderOnlyLibraries MaaUtils Boost::system ${OpenCV_LIBS} MaaCore)
 
 if(WIN32)
     target_link_libraries(maa-ctrl-adb-base ws2_32)
