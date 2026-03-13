@@ -37,8 +37,8 @@ bool DllController::connect(const std::string& adb_path, const std::string& addr
 
     m_handle = m_loader.create(adb_path.c_str(), address.c_str(), config.c_str());
     if (!m_handle) {
-        const char* err = m_loader.last_error(nullptr);
-        Log.error("DllController: failed to create handle for", m_dll_name, err ? err : "");
+        Log.error("DllController: failed to create handle for", m_dll_name,
+                  "(handle is nullptr, check DLL create() implementation)");
         return false;
     }
 
@@ -122,9 +122,12 @@ bool DllController::screencap(cv::Mat& image_payload, bool allow_reconnect [[may
         return false;
     }
 
-    // DLL returns BGR raw bytes (3 channels, row-major)
-    cv::Mat bgr(static_cast<int>(h), static_cast<int>(w), CV_8UC3, const_cast<uint8_t*>(data));
-    bgr.copyTo(image_payload);
+    // ap_ffi returns RGBA raw bytes (4 channels), need to convert to BGR for OpenCV
+    // or try interpreting as BGR first if it's already in the right format
+    cv::Mat rgba(static_cast<int>(h), static_cast<int>(w), CV_8UC4, const_cast<uint8_t*>(data));
+
+    // Convert RGBA -> BGR (OpenCV uses BGR by default)
+    cv::cvtColor(rgba, image_payload, cv::COLOR_RGBA2BGR);
 
     m_screen_size = { static_cast<int>(w), static_cast<int>(h) };
     return true;

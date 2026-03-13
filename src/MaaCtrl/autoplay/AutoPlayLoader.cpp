@@ -1,8 +1,6 @@
 #include "AutoPlayLoader.h"
 
 // #include "Utils/Logger.hpp"  // Avoid Platform.h dependency
-#include <iostream>
-#include <sstream>
 
 // Simple logging for DLL (variadic template version)
 namespace asst {
@@ -50,14 +48,15 @@ bool AutoPlayLoader::load(const std::filesystem::path& dll_path)
         full_path += ".dll";
     }
 
-    Log.info("Loading ap_ffi from", full_path);
-
     m_module = LoadLibraryW(full_path.wstring().c_str());
     if (!m_module) {
         DWORD error = GetLastError();
         Log.error("Failed to load ap_ffi DLL, error code:", error);
         return false;
     }
+
+    // Immediately free any console window that ap_ffi might have created
+    FreeConsole();
 
     auto get_proc = [this](const char* name) -> void* {
         return reinterpret_cast<void*>(GetProcAddress(static_cast<HMODULE>(m_module), name));

@@ -9,6 +9,10 @@
 #include <string>
 #include <mutex>
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 // Internal state wrapping the ap_ffi handle
 struct AutoPlayState
 {
@@ -34,6 +38,11 @@ EXPORT MaaCtrlHandle* maa_ctrl_create(const char* adb_path, const char* address,
 {
     (void)adb_path;
     (void)config_json;
+
+#ifdef _WIN32
+    // Free any console window that might have been created by dependencies
+    FreeConsole();
+#endif
 
     auto* state = new AutoPlayState();
 
