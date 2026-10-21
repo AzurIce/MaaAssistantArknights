@@ -51,15 +51,19 @@ JOBS=${JOBS:-8}
 
 nix shell nixpkgs#cmake nixpkgs#ninja nixpkgs#clang nixpkgs#libcxx nixpkgs#libcxx.dev nixpkgs#lld -c bash -c "
 set -euo pipefail
-cmake -B build -GNinja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER=$TOOLCHAIN/clang \
-    -DCMAKE_CXX_COMPILER=$TOOLCHAIN/clangxx \
-    -DWITH_RPATH_LIBRARY=OFF \
-    -DCMAKE_EXE_LINKER_FLAGS='$LINK_FLAGS' \
-    -DCMAKE_SHARED_LINKER_FLAGS='$LINK_FLAGS' \
-    -DCMAKE_MODULE_LINKER_FLAGS='$LINK_FLAGS' \
-    $*
+# 编译器路径变化时 CMake 会丢弃缓存并自动重跑，首次 -D 参数可能不生效，
+# 因此跑两遍（第二遍是幂等的快速配置）。
+for _ in 1 2; do
+    cmake -B build -GNinja \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_C_COMPILER=$TOOLCHAIN/clang \
+        -DCMAKE_CXX_COMPILER=$TOOLCHAIN/clangxx \
+        -DWITH_RPATH_LIBRARY=OFF \
+        -DCMAKE_EXE_LINKER_FLAGS='$LINK_FLAGS' \
+        -DCMAKE_SHARED_LINKER_FLAGS='$LINK_FLAGS' \
+        -DCMAKE_MODULE_LINKER_FLAGS='$LINK_FLAGS' \
+        $*
+done
 cmake --build build -j$JOBS
 "
 
