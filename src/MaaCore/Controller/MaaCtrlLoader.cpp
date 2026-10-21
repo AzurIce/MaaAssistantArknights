@@ -16,9 +16,35 @@ MaaCtrlLoader::~MaaCtrlLoader()
     unload();
 }
 
+#ifdef __linux__
+namespace
+{
+// MaaCore 通常由宿主以 RTLD_LOCAL dlopen，插件 DSO 里那些头文件 inline 单例
+// （SingletonHolder<Config/Logger/...>）会各自实例化一份，读到的是未初始化的 Config。
+// 在加载插件前把自身提升到全局符号表，插件里的弱定义就会被 MaaCore 的实例抢占。
+void promote_self_to_global()
+{
+    static bool done = false;
+    if (done) {
+        return;
+    }
+    done = true;
+    Dl_info info {};
+    if (dladdr(reinterpret_cast<void*>(&promote_self_to_global), &info) != 0 && info.dli_fname != nullptr) {
+        // NOLOAD: 对象已加载，只提升可见性，不重复初始化
+        dlopen(info.dli_fname, RTLD_NOW | RTLD_NOLOAD | RTLD_GLOBAL);
+    }
+}
+} // namespace
+#endif
+
 bool MaaCtrlLoader::load(const std::filesystem::path& dll_path)
 {
     LogTraceFunction;
+
+#ifdef __linux__
+    promote_self_to_global();
+#endif
 
     if (m_module) {
         Log.warn("MaaCtrlLoader: already loaded");
