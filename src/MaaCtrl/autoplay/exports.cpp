@@ -34,10 +34,10 @@ struct AutoPlayState
 extern "C"
 {
 
-EXPORT MaaCtrlHandle* maa_ctrl_create(const char* adb_path, const char* address, const char* config_json)
+EXPORT MaaCtrlHandle* maa_ctrl_create(const MaaCtrlCreateInfo* info)
 {
-    (void)adb_path;
-    (void)config_json;
+    if (!info) return nullptr;
+    const char* address = info->address;
 
 #ifdef _WIN32
     // Free any console window that might have been created by dependencies

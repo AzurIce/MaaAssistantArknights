@@ -20,6 +20,8 @@ class DllController : public ControllerAPI, private InstHelper
 {
 public:
     DllController(const AsstCallback& callback, Assistant* inst, const std::string& dll_name);
+
+    void set_platform_type(int32_t platform_type) noexcept { m_platform_type = platform_type; }
     virtual ~DllController() override;
 
     DllController(const DllController&) = delete;
@@ -61,8 +63,10 @@ public: // ControllerAPI interface
 
 private:
     void callback(AsstMsg msg, const json::value& details);
+    static void s_trampoline(int32_t msg, const char* json_utf8, void* user_data);
 
     AsstCallback m_callback = nullptr;
+    int32_t m_platform_type = 0;
     std::string m_dll_name;
     MaaCtrlLoader m_loader;
     MaaCtrlHandle* m_handle = nullptr;

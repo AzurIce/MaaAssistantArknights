@@ -39,7 +39,7 @@ public:
     ~Controller();
 
     std::shared_ptr<ControllerAPI> create_controller(ControllerType type, PlatformType platform_type) const;
-    std::shared_ptr<ControllerAPI> create_dll_controller(const std::string& dll_name) const;
+    std::shared_ptr<ControllerAPI> create_dll_controller(const std::string& dll_name, PlatformType platform_type) const;
 
     bool connect(const std::string& adb_path, const std::string& address, const std::string& config);
 #ifdef _WIN32

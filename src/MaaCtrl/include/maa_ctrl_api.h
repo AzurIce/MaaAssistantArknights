@@ -44,9 +44,19 @@ typedef void MaaCtrlHandle;
  *   - AutoPlay:       unused (may be empty string)
  *   - PlayTools:      screencap method string ("RGBA" / "BGR" / "MacSCK")
  */
-MAA_CTRL_API MaaCtrlHandle* maa_ctrl_create(const char* adb_path,
-                               const char* address,
-                               const char* config_json);
+/* 回调桥：插件把 AsstMsg/json 转发给宿主（MaaCore 侧解析后调 AsstCallback）。 */
+typedef void (*MaaCtrlCallback)(int32_t msg, const char* json_utf8, void* user_data);
+
+typedef struct MaaCtrlCreateInfo {
+    const char* adb_path;
+    const char* address;
+    const char* config_json;
+    int32_t platform_type;
+    MaaCtrlCallback callback;
+    void* user_data;
+} MaaCtrlCreateInfo;
+
+MAA_CTRL_API MaaCtrlHandle* maa_ctrl_create(const MaaCtrlCreateInfo* info);
 MAA_CTRL_API void maa_ctrl_destroy(MaaCtrlHandle* handle);
 
 /* --- Status ------------------------------------------------------------- */

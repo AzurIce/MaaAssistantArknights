@@ -25,6 +25,19 @@ DllController::~DllController()
     }
 }
 
+void DllController::s_trampoline(int32_t msg, const char* json_utf8, void* user_data)
+{
+    auto* self = static_cast<DllController*>(user_data);
+    if (self == nullptr || self->m_callback == nullptr || json_utf8 == nullptr) {
+        return;
+    }
+    json::value details = json::object {};
+    if (auto parsed = json::parse(json_utf8)) {
+        details = *parsed;
+    }
+    self->m_callback(static_cast<AsstMsg>(msg), details, self->m_inst);
+}
+
 bool DllController::connect(const std::string& adb_path, const std::string& address, const std::string& config)
 {
     LogTraceFunction;
@@ -35,7 +48,14 @@ bool DllController::connect(const std::string& adb_path, const std::string& addr
         return false;
     }
 
-    m_handle = m_loader.create(adb_path.c_str(), address.c_str(), config.c_str());
+    MaaCtrlCreateInfo info {};
+    info.adb_path = adb_path.c_str();
+    info.address = address.c_str();
+    info.config_json = config.c_str();
+    info.platform_type = m_platform_type;
+    info.callback = &DllController::s_trampoline;
+    info.user_data = this;
+    m_handle = m_loader.create(&info);
     if (!m_handle) {
         Log.error("DllController: failed to create handle for", m_dll_name,
                   "(handle is nullptr, check DLL create() implementation)");

@@ -144,13 +144,13 @@ void MaaCtrlLoader::unload()
 
 // --- Lifecycle ---
 
-MaaCtrlHandle* MaaCtrlLoader::create(const char* adb_path, const char* address, const char* config_json)
+MaaCtrlHandle* MaaCtrlLoader::create(const MaaCtrlCreateInfo* info)
 {
     if (!m_create) {
         Log.error("maa_ctrl_create not available");
         return nullptr;
     }
-    return m_create(adb_path, address, config_json);
+    return m_create(info);
 }
 
 void MaaCtrlLoader::destroy(MaaCtrlHandle* handle)

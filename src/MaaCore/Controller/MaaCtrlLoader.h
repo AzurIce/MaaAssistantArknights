@@ -27,7 +27,7 @@ public:
     bool loaded() const noexcept { return m_module != nullptr; }
 
     // --- Lifecycle ---
-    MaaCtrlHandle* create(const char* adb_path, const char* address, const char* config_json);
+    MaaCtrlHandle* create(const MaaCtrlCreateInfo* info);
     void destroy(MaaCtrlHandle* handle);
 
     // --- Status ---
@@ -75,7 +75,7 @@ private:
     void* m_module = nullptr;
 
     // Function pointer types matching maa_ctrl_api.h
-    using CreateFunc = MaaCtrlHandle* (*)(const char*, const char*, const char*);
+    using CreateFunc = MaaCtrlHandle* (*)(const MaaCtrlCreateInfo*);
     using DestroyFunc = void (*)(MaaCtrlHandle*);
     using InitedFunc = bool (*)(const MaaCtrlHandle*);
     using GetUuidFunc = const char* (*)(const MaaCtrlHandle*);

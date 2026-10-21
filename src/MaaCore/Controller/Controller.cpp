@@ -88,10 +88,14 @@ std::shared_ptr<asst::ControllerAPI>
     }
 }
 
-std::shared_ptr<asst::ControllerAPI> asst::Controller::create_dll_controller(const std::string& dll_name) const
+std::shared_ptr<asst::ControllerAPI> asst::Controller::create_dll_controller(
+    const std::string& dll_name,
+    PlatformType platform_type) const
 {
     try {
-        return std::make_shared<DllController>(m_callback, m_inst, dll_name);
+        auto controller = std::make_shared<DllController>(m_callback, m_inst, dll_name);
+        controller->set_platform_type(static_cast<int32_t>(platform_type));
+        return controller;
     }
     catch (const std::exception& e) {
         Log.error("Unable to create DllController:", dll_name, e.what());
@@ -292,7 +296,7 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
     }
 
     if (!m_ctrl_dll_name.empty()) {
-        m_controller = create_dll_controller(m_ctrl_dll_name);
+        m_controller = create_dll_controller(m_ctrl_dll_name, m_platform_type);
     }
     else {
         m_controller = create_controller(m_controller_type, m_platform_type);
