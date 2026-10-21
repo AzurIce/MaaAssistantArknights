@@ -161,14 +161,23 @@ bool DllController::swipe(
     const Point& p1,
     const Point& p2,
     int duration,
-    bool extra_swipe [[maybe_unused]],
+    SwipeExtraDirection extra_swipe,
     double slope_in,
     double slope_out,
     bool with_pause)
 {
     if (!m_handle) return false;
-    return m_loader.swipe(m_handle, p1.x, p1.y, p2.x, p2.y,
-                          static_cast<int32_t>(duration), slope_in, slope_out, with_pause);
+    return m_loader.swipe(
+        m_handle,
+        p1.x,
+        p1.y,
+        p2.x,
+        p2.y,
+        static_cast<int32_t>(duration),
+        static_cast<int32_t>(extra_swipe),
+        slope_in,
+        slope_out,
+        with_pause);
 }
 
 bool DllController::inject_input_event(const InputEvent& event)

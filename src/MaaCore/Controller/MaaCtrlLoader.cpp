@@ -222,10 +222,11 @@ bool MaaCtrlLoader::click(MaaCtrlHandle* handle, int32_t x, int32_t y)
 }
 
 bool MaaCtrlLoader::swipe(MaaCtrlHandle* handle, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
-                           int32_t duration_ms, double slope_in, double slope_out, bool with_pause)
+                           int32_t duration_ms, int32_t extra_swipe, double slope_in, double slope_out,
+                           bool with_pause)
 {
     if (!m_swipe || !handle) return false;
-    return m_swipe(handle, x1, y1, x2, y2, duration_ms, slope_in, slope_out, with_pause);
+    return m_swipe(handle, x1, y1, x2, y2, duration_ms, extra_swipe, slope_in, slope_out, with_pause);
 }
 
 bool MaaCtrlLoader::press_esc(MaaCtrlHandle* handle)

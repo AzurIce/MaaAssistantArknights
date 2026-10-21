@@ -32,8 +32,8 @@ public:
     bool screencap(void* handle);
     bool get_image(const void* handle, uint32_t* w, uint32_t* h, const uint8_t** data, uint32_t* len) const;
     bool click(void* handle, int32_t x, int32_t y);
-    bool swipe(void* handle, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t duration_ms, double slope_in,
-               double slope_out);
+    bool swipe(void* handle, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t duration_ms,
+               double slope_in, double slope_out);
     bool press_esc(void* handle);
     bool input_text(void* handle, const char* text);
     bool start_game(void* handle, const char* intent);

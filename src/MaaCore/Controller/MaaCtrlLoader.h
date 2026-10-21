@@ -46,7 +46,7 @@ public:
     // --- Input ---
     bool click(MaaCtrlHandle* handle, int32_t x, int32_t y);
     bool swipe(MaaCtrlHandle* handle, int32_t x1, int32_t y1, int32_t x2, int32_t y2,
-               int32_t duration_ms, double slope_in, double slope_out, bool with_pause);
+               int32_t duration_ms, int32_t extra_swipe, double slope_in, double slope_out, bool with_pause);
     bool press_esc(MaaCtrlHandle* handle);
     bool input_text(MaaCtrlHandle* handle, const char* text);
 
@@ -86,7 +86,7 @@ private:
     using ScreencapFunc = bool (*)(MaaCtrlHandle*);
     using GetImageFunc = bool (*)(const MaaCtrlHandle*, uint32_t*, uint32_t*, const uint8_t**, uint32_t*);
     using ClickFunc = bool (*)(MaaCtrlHandle*, int32_t, int32_t);
-    using SwipeFunc = bool (*)(MaaCtrlHandle*, int32_t, int32_t, int32_t, int32_t, int32_t, double, double, bool);
+    using SwipeFunc = bool (*)(MaaCtrlHandle*, int32_t, int32_t, int32_t, int32_t, int32_t, int32_t, double, double, bool);
     using PressEscFunc = bool (*)(MaaCtrlHandle*);
     using InputTextFunc = bool (*)(MaaCtrlHandle*, const char*);
     using TouchDownFunc = bool (*)(MaaCtrlHandle*, int32_t, int32_t, int32_t, int32_t);

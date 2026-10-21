@@ -47,7 +47,7 @@ public: // ControllerAPI interface
 
     virtual bool click(const Point& p) override;
     virtual bool input(const std::string& text) override;
-    virtual bool swipe(const Point& p1, const Point& p2, int duration = 0, bool extra_swipe = false,
+    virtual bool swipe(const Point& p1, const Point& p2, int duration = 0, SwipeExtraDirection extra_swipe = SwipeExtraDirection::None,
                        double slope_in = 1, double slope_out = 1, bool with_pause = false) override;
 
     virtual bool inject_input_event(const InputEvent& event) override;

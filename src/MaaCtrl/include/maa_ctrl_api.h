@@ -70,6 +70,7 @@ MAA_CTRL_API bool maa_ctrl_swipe(MaaCtrlHandle* handle,
                     int32_t x1, int32_t y1,
                     int32_t x2, int32_t y2,
                     int32_t duration_ms,
+                    int32_t extra_swipe,
                     double slope_in, double slope_out,
                     bool with_pause);
 MAA_CTRL_API bool maa_ctrl_press_esc(MaaCtrlHandle* handle);

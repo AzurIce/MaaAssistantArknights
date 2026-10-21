@@ -154,9 +154,11 @@ EXPORT bool maa_ctrl_swipe(MaaCtrlHandle* handle,
                            int32_t x1, int32_t y1,
                            int32_t x2, int32_t y2,
                            int32_t duration_ms,
+                           int32_t extra_swipe,
                            double slope_in, double slope_out,
                            bool with_pause)
 {
+    (void)extra_swipe;
     (void)with_pause;
     if (!handle) return false;
     auto* state = reinterpret_cast<AutoPlayState*>(handle);
