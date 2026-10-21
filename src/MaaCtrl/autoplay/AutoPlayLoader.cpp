@@ -70,6 +70,11 @@ bool AutoPlayLoader::load(const std::filesystem::path& dll_path)
 
     m_module = dlopen(full_path.c_str(), RTLD_NOW);
     if (!m_module) {
+        // cdylib 在 Unix 上是 lib<name>.so，先试无前缀（Windows 风格），再试 lib 前缀
+        auto alt = full_path.parent_path() / ("lib" + full_path.filename().string());
+        m_module = dlopen(alt.c_str(), RTLD_NOW);
+    }
+    if (!m_module) {
         Log.error("Failed to load ap_ffi:", dlerror());
         return false;
     }

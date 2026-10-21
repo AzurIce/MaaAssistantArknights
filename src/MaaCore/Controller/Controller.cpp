@@ -40,6 +40,8 @@
 #include "DllController.h"
 #include "Utils/Logger.hpp"
 
+#include <cstdlib>
+
 asst::Controller::Controller(const AsstCallback& callback, Assistant* inst) :
     InstHelper(inst),
     m_callback(callback)
@@ -282,6 +284,12 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
 
     // attach_window 会将 m_controller_type 置为 Win32，连接前按 touch mode 重新派生
     set_touch_mode(m_touch_mode);
+
+    // 调试/过渡用：MAA_CTRL_DLL 直接指定插件（可以是绝对路径，也可以是 dlopen 能搜索到的名字）
+    if (const char* dll_env = std::getenv("MAA_CTRL_DLL"); dll_env != nullptr && *dll_env != '\0') {
+        Log.info("Controller: use controller plugin from MAA_CTRL_DLL:", dll_env);
+        m_ctrl_dll_name = dll_env;
+    }
 
     if (!m_ctrl_dll_name.empty()) {
         m_controller = create_dll_controller(m_ctrl_dll_name);
