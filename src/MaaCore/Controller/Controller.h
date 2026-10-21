@@ -39,6 +39,7 @@ public:
     ~Controller();
 
     std::shared_ptr<ControllerAPI> create_controller(ControllerType type, PlatformType platform_type) const;
+    std::shared_ptr<ControllerAPI> create_dll_controller(const std::string& dll_name) const;
 
     bool connect(const std::string& adb_path, const std::string& address, const std::string& config);
 #ifdef _WIN32
@@ -123,6 +124,9 @@ private:
     PlatformType m_platform_type = PlatformType::Native;
 
     ControllerType m_controller_type = ControllerType::Minitouch;
+
+    // 非空时 connect 走 DllController（maa-ctrl-* 插件），否则用内建控制器
+    std::string m_ctrl_dll_name;
 
     // 最近一次下发的触控模式；attach_window 会将 m_controller_type 置为 Win32，
     // 每次 connect 前据此重新派生 m_controller_type，避免残留 Win32 导致创建错误的控制器

@@ -33,6 +33,7 @@ add_library(HeaderOnlyLibraries INTERFACE)
 target_include_directories(HeaderOnlyLibraries INTERFACE 3rdparty/include)
 
 add_subdirectory(src/MaaCore)
+add_subdirectory(src/MaaCtrl)
 
 if(BUILD_WPF_GUI)
     add_subdirectory(src/MaaUpdater)

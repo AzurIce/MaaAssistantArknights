@@ -37,6 +37,7 @@
 #endif
 
 #include "Common/AsstTypes.h"
+#include "DllController.h"
 #include "Utils/Logger.hpp"
 
 asst::Controller::Controller(const AsstCallback& callback, Assistant* inst) :
@@ -85,8 +86,18 @@ std::shared_ptr<asst::ControllerAPI>
     }
 }
 
-size_t asst::Controller::get_pipe_data_size() const noexcept
+std::shared_ptr<asst::ControllerAPI> asst::Controller::create_dll_controller(const std::string& dll_name) const
 {
+    try {
+        return std::make_shared<DllController>(m_callback, m_inst, dll_name);
+    }
+    catch (const std::exception& e) {
+        Log.error("Unable to create DllController:", dll_name, e.what());
+        return nullptr;
+    }
+}
+
+size_t asst::Controller::get_pipe_data_size() const noexcept{
     return m_controller->get_pipe_data_size();
 }
 
@@ -272,7 +283,12 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
     // attach_window 会将 m_controller_type 置为 Win32，连接前按 touch mode 重新派生
     set_touch_mode(m_touch_mode);
 
-    m_controller = create_controller(m_controller_type, m_platform_type);
+    if (!m_ctrl_dll_name.empty()) {
+        m_controller = create_dll_controller(m_ctrl_dll_name);
+    }
+    else {
+        m_controller = create_controller(m_controller_type, m_platform_type);
+    }
     if (!m_controller) {
         Log.error("connect failed");
         return false;
@@ -410,6 +426,7 @@ bool asst::Controller::inited() noexcept
 void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
 {
     m_touch_mode = mode;
+    m_ctrl_dll_name.clear();
 
     switch (mode) {
     case TouchMode::Adb:
@@ -420,6 +437,10 @@ void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
         break;
     case TouchMode::Maatouch:
         m_controller_type = ControllerType::Maatouch;
+        break;
+    case TouchMode::AutoPlay:
+        m_controller_type = ControllerType::AutoPlay;
+        m_ctrl_dll_name = "maa-ctrl-autoplay";
         break;
     case TouchMode::MacPlayTools:
         m_controller_type = ControllerType::MacPlayTools;

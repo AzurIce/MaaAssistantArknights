@@ -15,6 +15,7 @@ enum class ControllerType
     Minitouch,
     Maatouch,
     MacPlayTools,
+    AutoPlay,
 #ifdef _WIN32
     Win32,
 #endif
