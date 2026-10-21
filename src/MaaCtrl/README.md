@@ -45,3 +45,12 @@ maatouch / mumu 四个插件共用。
 
 构建用 `tools/build_plugins.sh`（NixOS：clang + libc++ + MaaDeps），脚本会打印运行所需的
 `LD_LIBRARY_PATH`。
+
+## 范围说明
+
+- 除 Windows 的 `attach_window`（把游戏窗口嵌进 WPF GUI）外，所有 controller 都由插件提供。
+  该路径需要把 HWND 传给 `Win32Controller`，与触控后端无关，暂保留为内建实现（仅 `_WIN32`）。
+- `ControllerRegistry` 用于宿主枚举可用插件（按 `maa-ctrl-*.so` 是否存在过滤），当前未接 C API；
+  MaaCore 侧按 `touch_mode` 直接映射到插件名。
+- 平台条件插件：`maa-ctrl-maafw-android`（`ANDROID`）、`maa-ctrl-mumu`（`WITH_EMULATOR_EXTRAS`）、
+  `maa-ctrl-playtools` 的 MacSCK（`APPLE && WITH_MAC_SCK`）。
