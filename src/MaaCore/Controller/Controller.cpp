@@ -21,7 +21,6 @@
 
 #include "ControllerAPI.h"
 #include "MaaFwAdbController.h"
-#include "PlayToolsController.h"
 #if ASST_WITH_EMULATOR_EXTRAS
 #include "MumuController.h"
 #endif
@@ -56,8 +55,6 @@ std::shared_ptr<asst::ControllerAPI>
 {
     try {
         switch (type) {
-        case ControllerType::MacPlayTools:
-            return std::make_shared<PlayToolsController>(m_callback, m_inst, platform_type);
         case ControllerType::MaaFwAdb:
             return std::make_shared<MaaFwAdbController>(m_callback, m_inst, platform_type);
 #if ASST_WITH_EMULATOR_EXTRAS
@@ -450,6 +447,7 @@ void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
         break;
     case TouchMode::MacPlayTools:
         m_controller_type = ControllerType::MacPlayTools;
+        m_ctrl_dll_name = "maa-ctrl-playtools";
         break;
     case TouchMode::MaaFwAdb:
         m_controller_type = ControllerType::MaaFwAdb;
