@@ -494,3 +494,4 @@ CMakeUserPresets.json
 
 # mimosa security scan plugin
 /.mimosa
+/result

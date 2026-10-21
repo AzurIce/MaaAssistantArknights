@@ -43,7 +43,19 @@ maatouch / mumu 四个插件共用。
 
 ## 构建与运行
 
-构建用 `tools/build_plugins.sh`（NixOS：clang + libc++ + MaaDeps），脚本会打印运行所需的
+**flake（推荐，可复现）**：
+
+```bash
+nix build .#        # → result/lib：libMaaCore.so + 全部 maa-ctrl-* 插件 + libc++/libunwind/MaaDeps 运行库
+nix develop         # clang 21 + libc++ + MaaDeps（$MAA_DEPS、$LD_LIBRARY_PATH 已配好）
+```
+
+- 输入：nixpkgs（lock 固定）、`MaaXYZ/MaaUtils` 固定 commit、MaaDeps 2.12.6（devel + runtime，按 sha256 固定）。
+- 产物用 patchelf 写入 `$ORIGIN` rpath 并把 libc++/libunwind/opencv/onnxruntime/fastdeploy 一并装进
+  `result/lib`，`ldd` 无缺失。
+- 给 maa-cli 用时把 `MAA_DATA_DIR` 指到一个含 `lib/` 与 `resource/` 的目录（`lib/` 里放 `result/lib/*.so` 的软链）。
+
+**手动脚本**：`tools/build_plugins.sh`（同样用 clang + libc++ + MaaDeps），脚本会打印运行所需的
 `LD_LIBRARY_PATH`。
 
 ## 范围说明
