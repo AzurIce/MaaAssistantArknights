@@ -20,16 +20,13 @@
 #endif
 
 #include "ControllerAPI.h"
-#include "MaaFwAdbController.h"
 #if ASST_WITH_EMULATOR_EXTRAS
-#include "MumuController.h"
 #endif
 #ifdef _WIN32
 #include "Win32Controller.h"
 #endif
 
 #ifdef __ANDROID__
-#include "MaaFwAndroidNativeController.h"
 #endif
 
 #include "Common/AsstTypes.h"
@@ -48,32 +45,6 @@ asst::Controller::Controller(const AsstCallback& callback, Assistant* inst) :
 asst::Controller::~Controller()
 {
     LogTraceFunction;
-}
-
-std::shared_ptr<asst::ControllerAPI>
-    asst::Controller::create_controller(ControllerType type, PlatformType platform_type) const
-{
-    try {
-        switch (type) {
-        case ControllerType::MaaFwAdb:
-            return std::make_shared<MaaFwAdbController>(m_callback, m_inst, platform_type);
-#if ASST_WITH_EMULATOR_EXTRAS
-        case ControllerType::Mumu:
-            return std::make_shared<MumuController>(m_callback, m_inst, platform_type);
-#endif
-#ifdef __ANDROID__
-        case ControllerType::MaaFwAndroidNative:
-            Log.debug("Use Android");
-            return std::make_shared<MaaFwAndroidNativeController>(m_callback, m_inst);
-#endif
-        default:
-            return nullptr;
-        }
-    }
-    catch (const std::exception& e) {
-        Log.error("Unable to create controller: {}", e.what());
-        return nullptr;
-    }
 }
 
 std::shared_ptr<asst::ControllerAPI> asst::Controller::create_dll_controller(
@@ -283,12 +254,7 @@ bool asst::Controller::connect(const std::string& adb_path, const std::string& a
         m_ctrl_dll_name = dll_env;
     }
 
-    if (!m_ctrl_dll_name.empty()) {
-        m_controller = create_dll_controller(m_ctrl_dll_name, m_platform_type);
-    }
-    else {
-        m_controller = create_controller(m_controller_type, m_platform_type);
-    }
+    m_controller = create_dll_controller(m_ctrl_dll_name, m_platform_type);
     if (!m_controller) {
         Log.error("connect failed");
         return false;
@@ -451,15 +417,18 @@ void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
         break;
     case TouchMode::MaaFwAdb:
         m_controller_type = ControllerType::MaaFwAdb;
+        m_ctrl_dll_name = "maa-ctrl-maafw-adb";
         break;
 #if ASST_WITH_EMULATOR_EXTRAS
     case TouchMode::MumuExtras:
         m_controller_type = ControllerType::Mumu;
+        m_ctrl_dll_name = "maa-ctrl-mumu";
         break;
 #endif
 #ifdef __ANDROID__
     case TouchMode::Android:
         m_controller_type = ControllerType::MaaFwAndroidNative;
+        m_ctrl_dll_name = "maa-ctrl-maafw-android";
         break;
 #endif
     default:
