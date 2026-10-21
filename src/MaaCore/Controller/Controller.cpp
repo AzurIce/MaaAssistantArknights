@@ -19,11 +19,8 @@
 #pragma warning(pop)
 #endif
 
-#include "AdbController.h"
 #include "ControllerAPI.h"
 #include "MaaFwAdbController.h"
-#include "MaatouchController.h"
-#include "MinitouchController.h"
 #include "PlayToolsController.h"
 #if ASST_WITH_EMULATOR_EXTRAS
 #include "MumuController.h"
@@ -59,12 +56,6 @@ std::shared_ptr<asst::ControllerAPI>
 {
     try {
         switch (type) {
-        case ControllerType::Adb:
-            return std::make_shared<AdbController>(m_callback, m_inst, platform_type);
-        case ControllerType::Minitouch:
-            return std::make_shared<MinitouchController>(m_callback, m_inst, platform_type);
-        case ControllerType::Maatouch:
-            return std::make_shared<MaatouchController>(m_callback, m_inst, platform_type);
         case ControllerType::MacPlayTools:
             return std::make_shared<PlayToolsController>(m_callback, m_inst, platform_type);
         case ControllerType::MaaFwAdb:
@@ -443,12 +434,15 @@ void asst::Controller::set_touch_mode(const TouchMode& mode) noexcept
     switch (mode) {
     case TouchMode::Adb:
         m_controller_type = ControllerType::Adb;
+        m_ctrl_dll_name = "maa-ctrl-adb";
         break;
     case TouchMode::Minitouch:
         m_controller_type = ControllerType::Minitouch;
+        m_ctrl_dll_name = "maa-ctrl-minitouch";
         break;
     case TouchMode::Maatouch:
         m_controller_type = ControllerType::Maatouch;
+        m_ctrl_dll_name = "maa-ctrl-maatouch";
         break;
     case TouchMode::AutoPlay:
         m_controller_type = ControllerType::AutoPlay;

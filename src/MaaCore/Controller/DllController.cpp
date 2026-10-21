@@ -62,14 +62,6 @@ bool DllController::connect(const std::string& adb_path, const std::string& addr
         return false;
     }
 
-    if (!m_loader.inited(m_handle)) {
-        const char* err = m_loader.last_error(m_handle);
-        Log.error("DllController: handle not initialized:", err ? err : "unknown error");
-        m_loader.destroy(m_handle);
-        m_handle = nullptr;
-        return false;
-    }
-
     // Cache UUID
     const char* uuid = m_loader.get_uuid(m_handle);
     m_uuid = uuid ? uuid : "";
@@ -91,7 +83,9 @@ bool DllController::connect(const std::string& adb_path, const std::string& addr
 
 bool DllController::inited() const noexcept
 {
-    return m_inited;
+    // 部分控制器（ADB 系）的 inited 要等第一次 screencap 成功后才置位，
+    // 这里实时查询，连接阶段由后续 screencap 驱动初始化。
+    return m_handle != nullptr && m_loader.inited(m_handle);
 }
 
 void DllController::set_swipe_with_pause(bool enable) noexcept

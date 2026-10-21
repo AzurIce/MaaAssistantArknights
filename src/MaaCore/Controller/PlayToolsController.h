@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ControllerAPI.h"
-#include "MinitouchController.h"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
